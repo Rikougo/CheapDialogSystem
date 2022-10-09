@@ -3,6 +3,8 @@
     "version": "0.1.0",
     "description": "Self use dialog system that allows visual dialog asset creation and easy scene integration",
     "displayName": "CheapDialogSystem",
+    "unity": "2021.3",
+    "dependencies": {},
     "author": {
         "name": "Samuel 'Elye' Helye",
         "url": "https://github.com/Rikougo"
