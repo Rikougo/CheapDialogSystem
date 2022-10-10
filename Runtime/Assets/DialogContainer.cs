@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace CheapDialogSystem.Runtime.Assets
 {
-    [Serializable]
+    [Serializable, CreateAssetMenu(fileName = "DialogContainer", menuName = "CheapDialogSystem/DialogContainer")]
     public class DialogContainer : ScriptableObject
     {
         public List<NodeLinkData> NodeLinks = new List<NodeLinkData>();

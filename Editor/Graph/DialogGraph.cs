@@ -1,4 +1,5 @@
-﻿using CheapDialogSystem.Runtime.Assets;
+﻿using System;
+using CheapDialogSystem.Runtime.Assets;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
@@ -9,7 +10,7 @@ namespace CheapDialogSystem.Editor.Graph
 {
     public class DialogGraph : EditorWindow
     {
-        private string m_fileName = "New Narrative";
+        private DialogContainer m_currentAsset;
 
         private DialogGraphView m_graphView;
         private DialogContainer m_dialogueContainer;
@@ -35,30 +36,37 @@ namespace CheapDialogSystem.Editor.Graph
         {
             var l_toolbar = new Toolbar();
 
-            var l_fileNameTextField = new TextField("File Name:");
-            l_fileNameTextField.SetValueWithoutNotify(m_fileName);
+            var l_fileNameTextField = new ObjectField("File Name:")
+            {
+                objectType = typeof(DialogContainer),
+                allowSceneObjects = false
+            };
             l_fileNameTextField.MarkDirtyRepaint();
-            l_fileNameTextField.RegisterValueChangedCallback(p_evt => m_fileName = p_evt.newValue);
+            l_fileNameTextField.RegisterValueChangedCallback(p_evt =>
+            {
+                m_currentAsset = (DialogContainer)p_evt.newValue;
+                RequestDataOperation(false);
+            });
             l_toolbar.Add(l_fileNameTextField);
             l_toolbar.Add(new Button(() => RequestDataOperation(true)) {text = "Save Data"});
-            l_toolbar.Add(new Button(() => RequestDataOperation(false)) {text = "Load Data"});
             l_toolbar.Add(new Button(() => m_graphView.CreateNewDialogueNode("Dialogue Node", Vector2.zero)) {text = "New Node",});
             rootVisualElement.Add(l_toolbar);
         }
 
         private void RequestDataOperation(bool p_save)
         {
-            if (!string.IsNullOrEmpty(m_fileName))
+            if (m_currentAsset is not null)
             {
                 var l_saveUtility = DialogSaveUtility.GetInstance(m_graphView);
                 if (p_save)
-                    l_saveUtility.SaveGraph(m_fileName);
+                    l_saveUtility.SaveGraph(m_currentAsset);
                 else
-                    l_saveUtility.LoadGraph(m_fileName);
+                    l_saveUtility.LoadGraph(m_currentAsset);
             }
             else
             {
-                EditorUtility.DisplayDialog("Invalid File name", "Please Enter a valid filename", "OK");
+                if (p_save)
+                    EditorUtility.DisplayDialog("Null file", "Please specify an asset file.", "Ok");
             }
         }
 

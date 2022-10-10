@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f670cfbc9b964b4b993fdda4a9a851e6, type: 3}
+  m_Name: Test
+  m_EditorClassIdentifier: 
+  NodeLinks:
+  - BaseNodeGUID: 0d45bebc-75e4-4d34-a9fd-fc92abceb339
+    PortName: Next
+    TargetNodeGUID: 1eb5c695-cb1b-4605-aed9-e898204b1069
+  - BaseNodeGUID: 1eb5c695-cb1b-4605-aed9-e898204b1069
+    PortName: Non
+    TargetNodeGUID: 8b4febd1-9bbf-4685-a6d7-2a0c3c734cd6
+  DialogueNodeData:
+  - EntryPoint: 0
+    NodeGUID: 8b4febd1-9bbf-4685-a6d7-2a0c3c734cd6
+    DialogueText: D'accordcdscsqcsq
+    Position: {x: 496, y: 200}
+  - EntryPoint: 1
+    NodeGUID: 1eb5c695-cb1b-4605-aed9-e898204b1069
+    DialogueText: Oui ?
+    Position: {x: 259, y: 200}
+  ExposedProperties: []
+  CommentBlockData: []

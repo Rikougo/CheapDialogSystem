@@ -47,11 +47,11 @@ namespace CheapDialogSystem.Editor
             }
         }
 
-        public void SaveGraph(string p_filePath)
+        public void SaveGraph(DialogContainer p_container)
         {
             if (!Edges.Any()) return;
 
-            DialogSaveUtility.EnsurePath(p_filePath);
+            /*DialogSaveUtility.EnsurePath(p_filePath);
 
             DialogContainer l_container = Resources.Load<DialogContainer>($"Dialogs/{p_filePath}");
             // = ScriptableObject.CreateInstance<DialogContainer>();
@@ -60,12 +60,12 @@ namespace CheapDialogSystem.Editor
             {
                 l_container = ScriptableObject.CreateInstance<DialogContainer>();
                 AssetDatabase.CreateAsset(l_container, $"{DIALOG_PATH}/{p_filePath}.asset");
-            }
+            }*/
 
-            l_container.ExposedProperties.Clear();
-            l_container.NodeLinks.Clear();
-            l_container.CommentBlockData.Clear();
-            l_container.DialogueNodeData.Clear();
+            p_container.ExposedProperties.Clear();
+            p_container.NodeLinks.Clear();
+            p_container.CommentBlockData.Clear();
+            p_container.DialogueNodeData.Clear();
 
             Edge[] l_connectedPorts = Edges.Where(p_edge => p_edge.input.node != null).ToArray();
 
@@ -74,7 +74,7 @@ namespace CheapDialogSystem.Editor
                 DialogNode l_outputNode = l_connectedPorts[i].output.node as DialogNode;
                 DialogNode l_inputNode = l_connectedPorts[i].input.node as DialogNode;
 
-                l_container.NodeLinks.Add(new NodeLinkData()
+                p_container.NodeLinks.Add(new NodeLinkData()
                 {
                     BaseNodeGUID = l_outputNode.GUID,
                     PortName = l_connectedPorts[i].output.portName,
@@ -88,7 +88,7 @@ namespace CheapDialogSystem.Editor
                     .Where(p_edge => (p_edge.input.node as DialogNode)?.GUID == l_node.GUID)
                     .Any(p_edge => (p_edge.output.node as DialogNode)?.EntryPoint ?? false);
 
-                l_container.DialogueNodeData.Add(new DialogNodeData()
+                p_container.DialogueNodeData.Add(new DialogNodeData()
                 {
                     NodeGUID = l_node.GUID,
                     DialogueText = l_node.DialogueText,
@@ -98,13 +98,13 @@ namespace CheapDialogSystem.Editor
             }
             
             // AssetDatabase.CreateAsset(l_container, $"Assets/Resources/Dialogs/{p_filePath}.asset");
-            EditorUtility.SetDirty(l_container);
+            EditorUtility.SetDirty(p_container);
             AssetDatabase.SaveAssets();
         }
 
-        public void LoadGraph(string p_filePath)
+        public void LoadGraph(DialogContainer p_asset)
         {
-            m_dialogContainer = Resources.Load<DialogContainer>($"Dialogs/{p_filePath}");
+            m_dialogContainer = p_asset;
             if (m_dialogContainer == null)
             {
                 EditorUtility.DisplayDialog("File Not Found", "Target Narrative Data does not exist!", "OK");
@@ -123,7 +123,7 @@ namespace CheapDialogSystem.Editor
         /// </summary>
         private void ClearGraph()
         {
-            Nodes.Find(x => x.EntryPoint).GUID = m_dialogContainer.NodeLinks[0].BaseNodeGUID;
+            if (m_dialogContainer.NodeLinks.Count > 0) Nodes.Find(x => x.EntryPoint).GUID = m_dialogContainer.NodeLinks[0].BaseNodeGUID;
             foreach (var l_perNode in Nodes)
             {
                 if (l_perNode.EntryPoint) continue;
