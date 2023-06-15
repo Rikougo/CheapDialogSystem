@@ -5,6 +5,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace CheapDialogSystem.Editor.Graph
 {
@@ -14,6 +15,9 @@ namespace CheapDialogSystem.Editor.Graph
 
         private DialogGraphView m_graphView;
         private DialogContainer m_dialogueContainer;
+
+        private Button m_saveButton;
+        private Button m_addNodeButton;
 
         [MenuItem("Window/CheapDialogSystem/DialogGraph")]
         public static void CreateGraphViewWindow()
@@ -34,39 +38,72 @@ namespace CheapDialogSystem.Editor.Graph
 
         private void GenerateToolbar()
         {
-            var l_toolbar = new Toolbar();
+            Toolbar l_toolbar = new Toolbar();
 
-            var l_fileNameTextField = new ObjectField("File Name:")
+            ObjectField l_assetInput = new ObjectField("Asset:")
             {
                 objectType = typeof(DialogContainer),
                 allowSceneObjects = false
             };
-            l_fileNameTextField.MarkDirtyRepaint();
-            l_fileNameTextField.RegisterValueChangedCallback(p_evt =>
+            l_assetInput.MarkDirtyRepaint();
+            l_assetInput.RegisterValueChangedCallback(this.OnAssetChange);
+            l_toolbar.Add(l_assetInput);
+
+            m_saveButton = new Button(() => RequestDataOperation(true))
             {
-                m_currentAsset = (DialogContainer)p_evt.newValue;
-                RequestDataOperation(false);
-            });
-            l_toolbar.Add(l_fileNameTextField);
-            l_toolbar.Add(new Button(() => RequestDataOperation(true)) {text = "Save Data"});
-            l_toolbar.Add(new Button(() => m_graphView.CreateNewDialogueNode("Dialogue Node", Vector2.zero)) {text = "New Node",});
+                text = "Save Data"
+            };
+            m_addNodeButton = new Button(() => m_graphView.CreateNewDialogueNode("Dialogue Node", Vector2.zero))
+            {
+                text = "New Node",
+            };
+
+            l_toolbar.Add(m_saveButton);
+            l_toolbar.Add(m_addNodeButton);
+            
             rootVisualElement.Add(l_toolbar);
+            this.UpdateToolbar();
+        }
+
+        private void UpdateToolbar()
+        {
+            m_saveButton.SetEnabled(m_currentAsset != null);
+            m_addNodeButton.SetEnabled(m_currentAsset != null);
+        }
+
+        private void OnAssetChange(ChangeEvent<Object> p_event) 
+        {
+            if (p_event.newValue is DialogContainer l_dialogObject)
+            {
+                m_currentAsset = l_dialogObject;
+                this.RequestDataOperation(false);
+            }
+            else
+            {
+                m_currentAsset = null;
+                this.RequestDataOperation(false);
+            }
+            UpdateToolbar();
         }
 
         private void RequestDataOperation(bool p_save)
         {
-            if (m_currentAsset is not null)
+            DialogSaveUtility l_saveUtility = DialogSaveUtility.GetInstance(m_graphView);
+
+            if (p_save)
             {
-                var l_saveUtility = DialogSaveUtility.GetInstance(m_graphView);
-                if (p_save)
+                if (m_currentAsset is not null)
+                {
                     l_saveUtility.SaveGraph(m_currentAsset);
+                }
                 else
-                    l_saveUtility.LoadGraph(m_currentAsset);
+                {
+                    EditorUtility.DisplayDialog("Null file", "Please specify an asset file.", "Ok");
+                }
             }
             else
             {
-                if (p_save)
-                    EditorUtility.DisplayDialog("Null file", "Please specify an asset file.", "Ok");
+                l_saveUtility.LoadGraph(m_currentAsset);
             }
         }
 
@@ -74,7 +111,6 @@ namespace CheapDialogSystem.Editor.Graph
         {
             ConstructGraphView();
             GenerateToolbar();
-            // GenerateMiniMap();
         }
 
         private void GenerateMiniMap()

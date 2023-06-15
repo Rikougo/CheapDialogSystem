@@ -4,7 +4,7 @@ using UnityEngine;
 namespace CheapDialogSystem.Editor.Assets
 {
     [Serializable]
-    public class DialogNodeData
+    public struct DialogNodeData
     {
         public bool EntryPoint;
         public string NodeGUID;

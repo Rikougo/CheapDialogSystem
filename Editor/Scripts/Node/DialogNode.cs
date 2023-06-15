@@ -1,0 +1,70 @@
+﻿using System.Linq;
+using UnityEditor.Experimental.GraphView;
+using UnityEngine.UIElements;
+
+namespace CheapDialogSystem.Editor.Node
+{
+    public class DialogNode : UnityEditor.Experimental.GraphView.Node
+    {
+        public string DialogText;
+        public string GUID;
+        public bool EntryPoint = false;
+
+        public void OnTextChangeEvent(ChangeEvent<string> p_event)
+        {
+            DialogText = p_event.newValue;
+        }
+
+        public void AddChoicePort()
+        {
+            this.AddChoicePort("New choice");
+        }
+        
+        public void AddChoicePort(string p_portName)
+        {
+            var l_generatedPort = this.GetPortInstance(Direction.Output);
+            var l_portLabel = l_generatedPort.contentContainer.Q<Label>("type");
+            l_generatedPort.contentContainer.Remove(l_portLabel);
+
+
+            TextField l_textField = new TextField()
+            {
+                name = string.Empty,
+                value = p_portName
+            };
+            l_textField.RegisterValueChangedCallback(evt => l_generatedPort.portName = evt.newValue);
+            l_generatedPort.contentContainer.Add(new Label("  "));
+            l_generatedPort.contentContainer.Add(l_textField);
+            Button l_deleteButton = new Button(() => this.RemovePort(l_generatedPort))
+            {
+                text = "X"
+            };
+            l_generatedPort.contentContainer.Add(l_deleteButton);
+            l_generatedPort.portName = p_portName;
+            this.outputContainer.Add(l_generatedPort);
+            this.RefreshPorts();
+            this.RefreshExpandedState();
+        }
+        
+        public Port GetPortInstance(Direction p_nodeDirection, Port.Capacity p_capacity = Port.Capacity.Single)
+        {
+            return this.InstantiatePort(Orientation.Horizontal, p_nodeDirection, p_capacity, typeof(float));
+        }
+        
+        private void RemovePort(Port p_socket)
+        {
+            var l_targetEdge = p_socket.connections.ToList()
+                .Where(x => x.output.portName == p_socket.portName && x.output.node == p_socket.node);
+            if (l_targetEdge.Any())
+            {
+                var l_edge = l_targetEdge.First();
+                l_edge.input.Disconnect(l_edge);
+                // RemoveElement(l_targetEdge.First());
+            }
+
+            this.outputContainer.Remove(p_socket);
+            this.RefreshPorts();
+            this.RefreshExpandedState();
+        }
+    }
+}
