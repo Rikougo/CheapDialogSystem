@@ -16,6 +16,7 @@ namespace CheapDialogSystem.Editor.Graph
         private DialogGraphView m_graphView;
         private DialogContainer m_dialogueContainer;
 
+        private ObjectField m_assetInput;
         private Button m_saveButton;
         private Button m_addNodeButton;
 
@@ -24,6 +25,14 @@ namespace CheapDialogSystem.Editor.Graph
         {
             DialogGraph l_window = GetWindow<DialogGraph>();
             l_window.titleContent = new GUIContent("DialogGraph");
+        }
+
+        public static void CreateGraphViewWindowWithAsset(Object p_object)
+        {
+            DialogGraph l_window = GetWindow<DialogGraph>();
+            l_window.titleContent = new GUIContent("DialogGraph");
+            l_window.m_assetInput.SetValueWithoutNotify(p_object);
+            l_window.UpdateCurrentAsset(p_object);
         }
 
         private void ConstructGraphView()
@@ -40,14 +49,14 @@ namespace CheapDialogSystem.Editor.Graph
         {
             Toolbar l_toolbar = new Toolbar();
 
-            ObjectField l_assetInput = new ObjectField("Asset:")
+            m_assetInput = new ObjectField("Asset:")
             {
                 objectType = typeof(DialogContainer),
                 allowSceneObjects = false
             };
-            l_assetInput.MarkDirtyRepaint();
-            l_assetInput.RegisterValueChangedCallback(this.OnAssetChange);
-            l_toolbar.Add(l_assetInput);
+            m_assetInput.MarkDirtyRepaint();
+            m_assetInput.RegisterValueChangedCallback(this.OnAssetChange);
+            l_toolbar.Add(m_assetInput);
 
             m_saveButton = new Button(() => RequestDataOperation(true))
             {
@@ -71,9 +80,14 @@ namespace CheapDialogSystem.Editor.Graph
             m_addNodeButton.SetEnabled(m_currentAsset != null);
         }
 
-        private void OnAssetChange(ChangeEvent<Object> p_event) 
+        private void OnAssetChange(ChangeEvent<Object> p_event)
         {
-            if (p_event.newValue is DialogContainer l_dialogObject)
+            UpdateCurrentAsset(p_event.newValue);
+        }
+
+        private void UpdateCurrentAsset(Object p_dialogContainer)
+        {
+            if (p_dialogContainer is DialogContainer l_dialogObject)
             {
                 m_currentAsset = l_dialogObject;
                 this.RequestDataOperation(false);
@@ -84,7 +98,7 @@ namespace CheapDialogSystem.Editor.Graph
                 this.RequestDataOperation(false);
             }
             UpdateToolbar();
-        }
+        } 
 
         private void RequestDataOperation(bool p_save)
         {
