@@ -33,7 +33,8 @@ namespace CheapDialogSystem.Editor.Node
             TextField l_textField = new TextField()
             {
                 name = string.Empty,
-                value = p_portName
+                value = p_portName,
+                multiline = true
             };
             l_textField.RegisterValueChangedCallback(p_event => l_generatedPort.portName = p_event.newValue);
             l_generatedPort.contentContainer.Add(new Label("  "));
