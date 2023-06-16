@@ -127,14 +127,6 @@ namespace CheapDialogSystem.Editor.Graph
             GenerateToolbar();
         }
 
-        private void GenerateMiniMap()
-        {
-            MiniMap l_miniMap = new MiniMap {anchored = true};
-            Vector2 l_cords = m_graphView.contentViewContainer.WorldToLocal(new Vector2(this.maxSize.x - 10, 30));
-            l_miniMap.SetPosition(new Rect(l_cords.x, l_cords.y, 200, 140));
-            m_graphView.Add(l_miniMap);
-        }
-
         private void OnDisable()
         {
             rootVisualElement.Remove(m_graphView);
