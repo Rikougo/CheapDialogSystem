@@ -128,6 +128,16 @@ namespace CheapDialogSystem.Editor.Graph
                 DialogText = p_nodeName,
                 GUID = Guid.NewGuid().ToString()
             };
+
+            l_tempDialogueNode.PortSuppressed += this.OnPortSuppressed;
+            
+            // Compute View center
+            Vector4 l_worldCenter = new Vector4(this.contentRect.center.x, this.contentRect.center.y, 0.0f, 1.0f);
+            Vector2 l_graphViewPositionCenter = this.viewTransform.matrix.inverse *  l_worldCenter;
+            Vector2 l_position = l_graphViewPositionCenter - (DefaultNodeSize / 2.0f);
+            l_tempDialogueNode.SetPosition(new Rect(l_position, DefaultNodeSize));
+            
+            // Load style
             l_tempDialogueNode.styleSheets.Add(Resources.Load<StyleSheet>("Node"));
             
             Port l_inputPort = l_tempDialogueNode.GetPortInstance(Direction.Input, Port.Capacity.Multi);
@@ -137,10 +147,6 @@ namespace CheapDialogSystem.Editor.Graph
             l_tempDialogueNode.RefreshExpandedState();
             l_tempDialogueNode.RefreshPorts();
 
-            Vector4 l_worldCenter = new Vector4(this.contentRect.center.x, this.contentRect.center.y, 0.0f, 1.0f);
-            Vector2 l_graphViewPositionCenter = this.viewTransform.matrix.inverse *  l_worldCenter;
-            Vector2 l_position = l_graphViewPositionCenter - (DefaultNodeSize / 2.0f);
-            l_tempDialogueNode.SetPosition(new Rect(l_position, DefaultNodeSize)); //To-Do: implement screen center instantiation positioning
 
             TextField l_textField = new TextField("Content")
             {
@@ -180,6 +186,11 @@ namespace CheapDialogSystem.Editor.Graph
             l_nodeCache.RefreshPorts();
             l_nodeCache.SetPosition(new Rect(100, 200, 100, 150));
             return l_nodeCache;
+        }
+
+        private void OnPortSuppressed(Edge p_edge)
+        {
+            this.RemoveElement(p_edge);
         }
     }
 }

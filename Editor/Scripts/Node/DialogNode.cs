@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 
@@ -9,6 +10,8 @@ namespace CheapDialogSystem.Editor.Node
         public string DialogText;
         public string GUID;
         public bool EntryPoint = false;
+
+        public Action<Edge> PortSuppressed; 
 
         public void OnTextChangeEvent(ChangeEvent<string> p_event)
         {
@@ -53,13 +56,17 @@ namespace CheapDialogSystem.Editor.Node
         
         private void RemovePort(Port p_socket)
         {
-            var l_targetEdge = p_socket.connections.ToList()
-                .Where(x => x.output.portName == p_socket.portName && x.output.node == p_socket.node);
+            Edge[] l_targetEdge = p_socket.connections
+                .Where(p_edge =>
+                    p_edge.output.portName == p_socket.portName && p_edge.output.node == p_socket.node
+                ).ToArray();
             if (l_targetEdge.Any())
             {
-                var l_edge = l_targetEdge.First();
+                Edge l_edge = l_targetEdge.First();
                 l_edge.input.Disconnect(l_edge);
-                // RemoveElement(l_targetEdge.First());
+                l_edge.output.Disconnect(l_edge);
+                
+                PortSuppressed?.Invoke(l_edge);
             }
 
             this.outputContainer.Remove(p_socket);
