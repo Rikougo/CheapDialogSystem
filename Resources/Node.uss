@@ -7,11 +7,8 @@ VisualElement {}
     flex-direction: column;
     padding: 4px;
     background-color: #282828;
-}
-
-unity-text-field__input {
-    color: aqua;
-    font-size: 14px;
+    max-width: 400px;
+    white-space: normal;
 }
 
 #content_editor Label {
