@@ -97,8 +97,7 @@ namespace CheapDialogSystem.Editor.Graph
             l_tempDialogueNode.PortSuppressed += this.OnPortSuppressed;
             
             // Compute View center
-            Vector4 l_worldCenter = new Vector4(this.contentRect.center.x, this.contentRect.center.y, 0.0f, 1.0f);
-            Vector2 l_graphViewPositionCenter = this.viewTransform.matrix.inverse *  l_worldCenter;
+            Vector2 l_graphViewPositionCenter = this.contentViewContainer.WorldToLocal(this.contentRect.center);
             Vector2 l_position = l_graphViewPositionCenter - (DefaultNodeSize / 2.0f);
             l_tempDialogueNode.SetPosition(new Rect(l_position, DefaultNodeSize));
             
