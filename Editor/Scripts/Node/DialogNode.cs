@@ -32,7 +32,7 @@ namespace CheapDialogSystem.Editor.Node
                 name = string.Empty,
                 value = p_portName
             };
-            l_textField.RegisterValueChangedCallback(evt => l_generatedPort.portName = evt.newValue);
+            l_textField.RegisterValueChangedCallback(p_event => l_generatedPort.portName = p_event.newValue);
             l_generatedPort.contentContainer.Add(new Label("  "));
             l_generatedPort.contentContainer.Add(l_textField);
             Button l_deleteButton = new Button(() => this.RemovePort(l_generatedPort))
@@ -41,6 +41,7 @@ namespace CheapDialogSystem.Editor.Node
             };
             l_generatedPort.contentContainer.Add(l_deleteButton);
             l_generatedPort.portName = p_portName;
+            l_generatedPort.name = "output_port"; // uss name
             this.outputContainer.Add(l_generatedPort);
             this.RefreshPorts();
             this.RefreshExpandedState();

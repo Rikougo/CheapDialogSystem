@@ -1,7 +1,3 @@
-VisualElement {}
-
-#add_choice_button { }
-
 #content_editor {
     display: flex;
     flex-direction: column;
@@ -14,4 +10,14 @@ VisualElement {}
 #content_editor Label {
     font-size: 14px;
     -unity-font-style: bold;
+}
+
+#output_port {
+    height: auto;
+    padding: 4px;
+}
+
+#output_port TextField{
+    max-width: 200px;
+    white-space: normal;
 }
