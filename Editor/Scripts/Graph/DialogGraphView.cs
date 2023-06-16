@@ -93,6 +93,8 @@ namespace CheapDialogSystem.Editor.Graph
                 DialogText = p_nodeName,
                 GUID = Guid.NewGuid().ToString()
             };
+
+            l_tempDialogueNode.PortSuppressed += this.OnPortSuppressed;
             
             // Compute View center
             Vector4 l_worldCenter = new Vector4(this.contentRect.center.x, this.contentRect.center.y, 0.0f, 1.0f);
@@ -147,6 +149,11 @@ namespace CheapDialogSystem.Editor.Graph
             l_nodeCache.RefreshPorts();
             l_nodeCache.SetPosition(new Rect(100, 200, 100, 150));
             return l_nodeCache;
+        }
+
+        private void OnPortSuppressed(Edge p_edge)
+        {
+            this.RemoveElement(p_edge);
         }
     }
 }
