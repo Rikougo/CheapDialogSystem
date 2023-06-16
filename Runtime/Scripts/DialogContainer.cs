@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using CheapDialogSystem.Editor.Assets;
+using CheapDialogSystem.Editor.Graph;
+using UnityEditor;
+using UnityEditor.Callbacks;
 using UnityEngine;
 
 namespace CheapDialogSystem.Runtime.Assets
@@ -20,5 +23,19 @@ namespace CheapDialogSystem.Runtime.Assets
         {
             return NodeLinks.Where(p_edge => p_edge.BaseNodeGUID == p_dialog.NodeGUID).ToList();
         }
+        
+        [OnOpenAsset]
+        //Handles opening the editor window when double-clicking project files
+        public static bool OnOpenAsset(int p_instanceID, int p_line)
+        {
+            DialogContainer project = EditorUtility.InstanceIDToObject(p_instanceID) as DialogContainer;
+            if (project != null)
+            {
+                DialogGraph.CreateGraphViewWindowWithAsset(project);
+                return true;
+            }
+            return false;
+        }
+
     }
 }
