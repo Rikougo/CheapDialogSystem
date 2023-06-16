@@ -14,7 +14,6 @@ namespace CheapDialogSystem.Runtime.Assets
     {
         public List<NodeLinkData> NodeLinks = new List<NodeLinkData>();
         public List<DialogNodeData> DialogueNodeData = new List<DialogNodeData>();
-        public List<ExposedProperty> ExposedProperties = new List<ExposedProperty>();
         public List<CommentBlockData> CommentBlockData = new List<CommentBlockData>();
 
         public DialogNodeData EntryPoint => DialogueNodeData.First(p_dialogData => p_dialogData.EntryPoint);
@@ -22,6 +21,13 @@ namespace CheapDialogSystem.Runtime.Assets
         public List<NodeLinkData> GetChoices(DialogNodeData p_dialog)
         {
             return NodeLinks.Where(p_edge => p_edge.BaseNodeGUID == p_dialog.NodeGUID).ToList();
+        }
+
+        public void Clear()
+        {
+            this.NodeLinks.Clear();
+            this.DialogueNodeData.Clear();
+            this.CommentBlockData.Clear();
         }
         
         [OnOpenAsset]

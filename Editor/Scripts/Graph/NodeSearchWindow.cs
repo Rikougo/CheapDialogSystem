@@ -47,20 +47,22 @@ namespace CheapDialogSystem.Editor.Graph
             return tree;
         }
 
-        public bool OnSelectEntry(SearchTreeEntry SearchTreeEntry, SearchWindowContext context)
+        public bool OnSelectEntry(SearchTreeEntry p_searchTreeEntry, SearchWindowContext p_context)
         {
             //Editor window-based mouse position
-            var mousePosition = m_window.rootVisualElement.ChangeCoordinatesTo(m_window.rootVisualElement.parent,
-                context.screenMousePosition - m_window.position.position);
-            var graphMousePosition = m_graphView.contentViewContainer.WorldToLocal(mousePosition);
-            switch (SearchTreeEntry.userData)
+            Vector2 l_mousePosition = m_window.rootVisualElement
+                .ChangeCoordinatesTo(
+                    m_window.rootVisualElement.parent,
+                    (p_context.screenMousePosition - m_window.position.position));
+            Vector2 l_graphMousePosition = m_graphView.contentViewContainer.WorldToLocal(l_mousePosition);
+            switch (p_searchTreeEntry.userData)
             {
-                case DialogNode dialogueNode:
-                    m_graphView.CreateNewDialogueNode("Dialogue Node", graphMousePosition);
+                case DialogNode l_dialogueNode:
+                    m_graphView.CreateNewDialogueNode("Dialogue Node", l_graphMousePosition);
                     return true;
-                case Group group:
-                    var rect = new Rect(graphMousePosition, m_graphView.DefaultCommentBlockSize);
-                    m_graphView.CreateCommentBlock(rect);
+                case Group l_group:
+                    Rect l_rect = new Rect(l_graphMousePosition, m_graphView.DefaultCommentBlockSize);
+                    m_graphView.CreateCommentBlock(l_rect);
                     return true;
             }
 

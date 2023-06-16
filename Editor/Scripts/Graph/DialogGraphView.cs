@@ -14,9 +14,7 @@ namespace CheapDialogSystem.Editor.Graph
         public readonly Vector2 DefaultNodeSize = new Vector2(200, 150);
         public readonly Vector2 DefaultCommentBlockSize = new Vector2(300, 200);
         public DialogNode EntryPointNode;
-        public Blackboard Blackboard = new Blackboard();
-        // public List<ExposedProperty> ExposedProperties { get; private set; } = new List<ExposedProperty>();
-        private NodeSearchWindow _searchWindow;
+        private NodeSearchWindow m_searchWindow;
 
         public DialogGraphView(DialogGraph p_editorWindow)
         {
@@ -39,15 +37,12 @@ namespace CheapDialogSystem.Editor.Graph
         
         private void AddSearchWindow(DialogGraph p_editorWindow)
         {
-            _searchWindow = ScriptableObject.CreateInstance<NodeSearchWindow>();
-            _searchWindow.Configure(p_editorWindow, this);
-            nodeCreationRequest = context =>
-                SearchWindow.Open(new SearchWindowContext(context.screenMousePosition), _searchWindow);
-        }
-        
-        public void ClearBlackBoardAndExposedProperties()
-        {
-            Blackboard.Clear();
+            m_searchWindow = ScriptableObject.CreateInstance<NodeSearchWindow>();
+            m_searchWindow.Configure(p_editorWindow, this);
+            nodeCreationRequest = (p_context) =>
+            {
+                SearchWindow.Open(new SearchWindowContext(p_context.screenMousePosition), m_searchWindow);
+            };
         }
 
         public Group CreateCommentBlock(Rect p_rect, CommentBlockData p_commentBlockData = null)

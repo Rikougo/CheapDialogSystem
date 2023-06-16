@@ -33,10 +33,7 @@ namespace CheapDialogSystem.Editor
         {
             if (!ViewEdges.Any()) return;
 
-            p_container.ExposedProperties.Clear();
-            p_container.NodeLinks.Clear();
-            p_container.CommentBlockData.Clear();
-            p_container.DialogueNodeData.Clear();
+            p_container.Clear();
 
             Edge[] l_connectedPorts = ViewEdges.Where(p_edge => p_edge.input.node != null).ToArray();
 
@@ -62,7 +59,7 @@ namespace CheapDialogSystem.Editor
                 p_container.DialogueNodeData.Add(new DialogNodeData()
                 {
                     NodeGUID = l_node.GUID,
-                    DialogueText = l_node.DialogText,
+                    DialogText = l_node.DialogText,
                     Position = l_node.GetPosition().position,
                     EntryPoint = l_isEntryPoint
                 });
@@ -121,7 +118,7 @@ namespace CheapDialogSystem.Editor
         {
             foreach (var l_perNode in m_dialogContainer.DialogueNodeData)
             {
-                DialogNode l_tempNode = m_targetGraphView.CreateNode(l_perNode.DialogueText, Vector2.zero);
+                DialogNode l_tempNode = m_targetGraphView.CreateNode(l_perNode.DialogText, Vector2.zero);
                 l_tempNode.GUID = l_perNode.NodeGUID;
                 m_targetGraphView.AddElement(l_tempNode);
 
