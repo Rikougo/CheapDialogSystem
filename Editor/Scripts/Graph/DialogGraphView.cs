@@ -63,41 +63,6 @@ namespace CheapDialogSystem.Editor.Graph
             return l_group;
         }
 
-        /*public void AddPropertyToBlackBoard(ExposedProperty property, bool loadMode = false)
-        {
-            string l_localPropertyName = property.PropertyName;
-            string l_localPropertyValue = property.PropertyValue;
-            if (!loadMode)
-            {
-                while (ExposedProperties.Any(x => x.PropertyName == l_localPropertyName))
-                {
-                    l_localPropertyName = $"{l_localPropertyName}(1)";
-                }
-            }
-
-            ExposedProperty l_item = ExposedProperty.CreateInstance();
-            l_item.PropertyName = l_localPropertyName;
-            l_item.PropertyValue = l_localPropertyValue;
-            ExposedProperties.Add(l_item);
-
-            VisualElement l_container = new VisualElement();
-            BlackboardField l_field = new BlackboardField { text = l_localPropertyName, typeText = "string" };
-            l_container.Add(l_field);
-
-            TextField l_propertyValueTextField = new TextField("Value:")
-            {
-                value = l_localPropertyValue
-            };
-            l_propertyValueTextField.RegisterValueChangedCallback(evt =>
-            {
-                int l_index = ExposedProperties.FindIndex(x => x.PropertyName == l_item.PropertyName);
-                ExposedProperties[l_index].PropertyValue = evt.newValue;
-            });
-            var sa = new BlackboardRow(l_field, l_propertyValueTextField);
-            l_container.Add(sa);
-            Blackboard.Add(l_container);
-        }*/
-
         public override List<Port> GetCompatiblePorts(Port p_startPort, NodeAdapter p_nodeAdapter)
         {
             List<Port> l_compatiblePorts = new List<Port>();
@@ -128,19 +93,21 @@ namespace CheapDialogSystem.Editor.Graph
                 DialogText = p_nodeName,
                 GUID = Guid.NewGuid().ToString()
             };
+            
+            // Compute View center
+            Vector4 l_worldCenter = new Vector4(this.contentRect.center.x, this.contentRect.center.y, 0.0f, 1.0f);
+            Vector2 l_graphViewPositionCenter = this.viewTransform.matrix.inverse *  l_worldCenter;
+            Vector2 l_position = l_graphViewPositionCenter - (DefaultNodeSize / 2.0f);
+            l_tempDialogueNode.SetPosition(new Rect(l_position, DefaultNodeSize));
+            
+            // Load style
             l_tempDialogueNode.styleSheets.Add(Resources.Load<StyleSheet>("Node"));
             
             Port l_inputPort = l_tempDialogueNode.GetPortInstance(Direction.Input, Port.Capacity.Multi);
             l_inputPort.portName = "Input";
-            
             l_tempDialogueNode.inputContainer.Add(l_inputPort);
             l_tempDialogueNode.RefreshExpandedState();
             l_tempDialogueNode.RefreshPorts();
-
-            Vector4 l_worldCenter = new Vector4(this.contentRect.center.x, this.contentRect.center.y, 0.0f, 1.0f);
-            Vector2 l_graphViewPositionCenter = this.viewTransform.matrix.inverse *  l_worldCenter;
-            Vector2 l_position = l_graphViewPositionCenter - (DefaultNodeSize / 2.0f);
-            l_tempDialogueNode.SetPosition(new Rect(l_position, DefaultNodeSize)); //To-Do: implement screen center instantiation positioning
 
             TextField l_textField = new TextField("Content")
             {
@@ -152,7 +119,7 @@ namespace CheapDialogSystem.Editor.Graph
             
             l_tempDialogueNode.mainContainer.Add(l_textField);
 
-            var l_button = new Button(l_tempDialogueNode.AddChoicePort)
+            Button l_button = new Button(l_tempDialogueNode.AddChoicePort)
             {
                 text = "Add Choice"
             };
