@@ -84,12 +84,28 @@ namespace CheapDialogSystem.Editor.Graph
             DialogNode l_tempDialogueNode = new DialogNode()
             {
                 title = "Dialog",
+                DialogTitle = "Title",
                 DialogText = p_nodeName,
                 GUID = Guid.NewGuid().ToString()
             };
 
             l_tempDialogueNode.PortSuppressed += this.OnPortSuppressed;
             
+            Button l_button = new Button(l_tempDialogueNode.AddChoicePort)
+            {
+                text = "Add Choice"
+            };
+            l_tempDialogueNode.titleButtonContainer.Add(l_button);
+            
+            TextField l_titleField = new TextField("")
+            {
+                name = "title_editor",
+                maxLength = 50
+            };
+            l_titleField.RegisterValueChangedCallback(l_tempDialogueNode.OnTitleChangeEvent);
+            l_titleField.SetValueWithoutNotify(l_tempDialogueNode.DialogTitle);
+            l_tempDialogueNode.titleContainer.Add(l_titleField);
+
             // Compute View center
             Vector2 l_graphViewPositionCenter = this.contentViewContainer.WorldToLocal(this.contentRect.center);
             Vector2 l_position = l_graphViewPositionCenter - (DefaultNodeSize / 2.0f);
@@ -104,21 +120,15 @@ namespace CheapDialogSystem.Editor.Graph
             l_tempDialogueNode.RefreshExpandedState();
             l_tempDialogueNode.RefreshPorts();
 
-            TextField l_textField = new TextField("Content")
+            TextField l_contentField = new TextField("Content")
             {
                 name = "content_editor",
                 multiline = true
             };
-            l_textField.RegisterValueChangedCallback(l_tempDialogueNode.OnTextChangeEvent);
-            l_textField.SetValueWithoutNotify(l_tempDialogueNode.DialogText);
+            l_contentField.RegisterValueChangedCallback(l_tempDialogueNode.OnContentChangeEvent);
+            l_contentField.SetValueWithoutNotify(l_tempDialogueNode.DialogText);
             
-            l_tempDialogueNode.mainContainer.Add(l_textField);
-
-            Button l_button = new Button(l_tempDialogueNode.AddChoicePort)
-            {
-                text = "Add Choice"
-            };
-            l_tempDialogueNode.titleButtonContainer.Add(l_button);
+            l_tempDialogueNode.mainContainer.Add(l_contentField);
             return l_tempDialogueNode;
         }
 
