@@ -1,6 +1,6 @@
 {
     "name": "com.elye.cheapdialogsystem",
-    "version": "0.1.0",
+    "version": "0.0.2",
     "description": "Self use dialog system that allows visual dialog asset creation and easy scene integration",
     "displayName": "CheapDialogSystem",
     "unity": "2021.3",
