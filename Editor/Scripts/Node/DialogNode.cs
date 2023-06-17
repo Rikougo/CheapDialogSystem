@@ -7,13 +7,19 @@ namespace CheapDialogSystem.Editor.Node
 {
     public class DialogNode : UnityEditor.Experimental.GraphView.Node
     {
+        public string DialogTitle;
         public string DialogText;
         public string GUID;
         public bool EntryPoint = false;
 
-        public Action<Edge> PortSuppressed; 
+        public Action<Edge> PortSuppressed;
 
-        public void OnTextChangeEvent(ChangeEvent<string> p_event)
+        public void OnTitleChangeEvent(ChangeEvent<string> p_event)
+        {
+            DialogTitle = p_event.newValue;
+        }
+        
+        public void OnContentChangeEvent(ChangeEvent<string> p_event)
         {
             DialogText = p_event.newValue;
         }

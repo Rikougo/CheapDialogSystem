@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using CheapDialogSystem.Editor.Assets;
 using CheapDialogSystem.Editor.Graph;
@@ -59,6 +58,7 @@ namespace CheapDialogSystem.Editor
                 p_container.DialogueNodeData.Add(new DialogNodeData()
                 {
                     NodeGUID = l_node.GUID,
+                    DialogTitle = l_node.DialogTitle,
                     DialogText = l_node.DialogText,
                     Position = l_node.GetPosition().position,
                     EntryPoint = l_isEntryPoint
