@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using CheapDialogSystem.Editor.Assets;
 using CheapDialogSystem.Editor.Graph;
@@ -14,16 +13,12 @@ namespace CheapDialogSystem.Editor
 {
     public class DialogSaveUtility
     {
-        private static string DIALOG_PATH = "Assets/Resources/Dialogs";
-
         private DialogGraphView m_targetGraphView;
         private DialogContainer m_dialogContainer;
 
-        private List<Edge> Edges => m_targetGraphView.edges.ToList();
-        private List<DialogNode> Nodes => m_targetGraphView.nodes.ToList().Cast<DialogNode>().ToList();
-
-        private List<Group> CommentBlocks =>
-            m_targetGraphView.graphElements.ToList().Where(x => x is Group).Cast<Group>().ToList();
+        private List<Edge> ViewEdges => m_targetGraphView.edges.ToList();
+        private List<DialogNode> ViewNodes => m_targetGraphView.nodes.ToList().Cast<DialogNode>().ToList();
+        private List<Group> ViewCommentBlocks => m_targetGraphView.graphElements.ToList().Where(x => x is Group).Cast<Group>().ToList();
 
         public static DialogSaveUtility GetInstance(DialogGraphView p_target)
         {
@@ -33,41 +28,13 @@ namespace CheapDialogSystem.Editor
             };
         }
 
-        public static void EnsurePath(string p_filePath)
-        {
-            string[] l_directories = p_filePath.Split("/");
-            for (int l_index = 0; l_index < l_directories.Length - 1; l_index++)
-            {
-                string l_currentPath = String.Join("/", new ArraySegment<string>(l_directories, 0, l_index).ToArray());
-                
-                string l_currentDirectory = l_currentPath == String.Empty ? l_directories[l_index] : l_currentPath + "/" + l_directories[l_index];
-                
-                if (!AssetDatabase.IsValidFolder($"{DIALOG_PATH}/{l_currentDirectory}"))
-                    AssetDatabase.CreateFolder(l_currentPath == String.Empty ? $"{DIALOG_PATH}" : $"{DIALOG_PATH}/{l_currentPath}", l_currentDirectory);
-            }
-        }
-
         public void SaveGraph(DialogContainer p_container)
         {
-            if (!Edges.Any()) return;
+            if (!ViewEdges.Any()) return;
 
-            /*DialogSaveUtility.EnsurePath(p_filePath);
+            p_container.Clear();
 
-            DialogContainer l_container = Resources.Load<DialogContainer>($"Dialogs/{p_filePath}");
-            // = ScriptableObject.CreateInstance<DialogContainer>();
-
-            if (l_container == null)
-            {
-                l_container = ScriptableObject.CreateInstance<DialogContainer>();
-                AssetDatabase.CreateAsset(l_container, $"{DIALOG_PATH}/{p_filePath}.asset");
-            }*/
-
-            p_container.ExposedProperties.Clear();
-            p_container.NodeLinks.Clear();
-            p_container.CommentBlockData.Clear();
-            p_container.DialogueNodeData.Clear();
-
-            Edge[] l_connectedPorts = Edges.Where(p_edge => p_edge.input.node != null).ToArray();
+            Edge[] l_connectedPorts = ViewEdges.Where(p_edge => p_edge.input.node != null).ToArray();
 
             for (int i = 0; i < l_connectedPorts.Length; i++)
             {
@@ -82,22 +49,22 @@ namespace CheapDialogSystem.Editor
                 });
             }
 
-            foreach (DialogNode l_node in Nodes.Where(p_node => !p_node.EntryPoint))
+            foreach (DialogNode l_node in ViewNodes.Where(p_node => !p_node.EntryPoint))
             {
-                bool l_isEntryPoint = Edges
+                bool l_isEntryPoint = ViewEdges
                     .Where(p_edge => (p_edge.input.node as DialogNode)?.GUID == l_node.GUID)
                     .Any(p_edge => (p_edge.output.node as DialogNode)?.EntryPoint ?? false);
 
                 p_container.DialogueNodeData.Add(new DialogNodeData()
                 {
                     NodeGUID = l_node.GUID,
-                    DialogueText = l_node.DialogueText,
+                    DialogTitle = l_node.DialogTitle,
+                    DialogText = l_node.DialogText,
                     Position = l_node.GetPosition().position,
                     EntryPoint = l_isEntryPoint
                 });
             }
             
-            // AssetDatabase.CreateAsset(l_container, $"Assets/Resources/Dialogs/{p_filePath}.asset");
             EditorUtility.SetDirty(p_container);
             AssetDatabase.SaveAssets();
         }
@@ -105,16 +72,15 @@ namespace CheapDialogSystem.Editor
         public void LoadGraph(DialogContainer p_asset)
         {
             m_dialogContainer = p_asset;
+            ClearGraph();
+            
             if (m_dialogContainer == null)
             {
-                EditorUtility.DisplayDialog("File Not Found", "Target Narrative Data does not exist!", "OK");
                 return;
             }
-
-            ClearGraph();
+            
             GenerateDialogueNodes();
             ConnectDialogueNodes();
-            AddExposedProperties();
             GenerateCommentBlocks();
         }
 
@@ -123,12 +89,24 @@ namespace CheapDialogSystem.Editor
         /// </summary>
         private void ClearGraph()
         {
-            if (m_dialogContainer.NodeLinks.Count > 0) Nodes.Find(x => x.EntryPoint).GUID = m_dialogContainer.NodeLinks[0].BaseNodeGUID;
-            foreach (var l_perNode in Nodes)
+            if (m_dialogContainer != null && m_dialogContainer.NodeLinks.Count > 0)
             {
+                // Force GUID of EntryPoint Node in graphview to match with saved GUID
+                DialogNode l_startNode = ViewNodes.Find(p_node => p_node.EntryPoint);
+                l_startNode.GUID = m_dialogContainer.NodeLinks[0].BaseNodeGUID;
+            }
+            
+            foreach (var l_perNode in ViewNodes)
+            {
+                IEnumerable<Edge> l_edges = ViewEdges.Where(p_edge => p_edge.input.node == l_perNode);
+
+                foreach (Edge l_edge in l_edges)
+                {
+                    m_targetGraphView.RemoveElement(l_edge);
+                }
+
+                // Don't remove EntryPoint graphview node
                 if (l_perNode.EntryPoint) continue;
-                Edges.Where(x => x.input.node == l_perNode).ToList()
-                    .ForEach(edge => m_targetGraphView.RemoveElement(edge));
                 m_targetGraphView.RemoveElement(l_perNode);
             }
         }
@@ -140,26 +118,30 @@ namespace CheapDialogSystem.Editor
         {
             foreach (var l_perNode in m_dialogContainer.DialogueNodeData)
             {
-                var l_tempNode = m_targetGraphView.CreateNode(l_perNode.DialogueText, Vector2.zero);
+                DialogNode l_tempNode = m_targetGraphView.CreateNode(l_perNode.DialogText, Vector2.zero);
                 l_tempNode.GUID = l_perNode.NodeGUID;
                 m_targetGraphView.AddElement(l_tempNode);
 
-                var l_nodePorts = m_dialogContainer.NodeLinks.Where(x => x.BaseNodeGUID == l_perNode.NodeGUID).ToList();
-                l_nodePorts.ForEach(x => m_targetGraphView.AddChoicePort(l_tempNode, x.PortName));
+                List<NodeLinkData> l_nodePorts = m_dialogContainer.NodeLinks.Where(x => x.BaseNodeGUID == l_perNode.NodeGUID).ToList();
+                l_nodePorts.ForEach(x => l_tempNode.AddChoicePort(x.PortName));
             }
         }
 
         private void ConnectDialogueNodes()
         {
-            for (var i = 0; i < Nodes.Count; i++)
+            for (var i = 0; i < ViewNodes.Count; i++)
             {
                 var k = i; //Prevent access to modified closure
-                var l_connections = m_dialogContainer.NodeLinks.Where(x => x.BaseNodeGUID == Nodes[k].GUID).ToList();
+                var l_connections = m_dialogContainer.NodeLinks.Where(x => x.BaseNodeGUID == ViewNodes[k].GUID).ToList();
                 for (var j = 0; j < l_connections.Count(); j++)
                 {
-                    var l_targetNodeGuid = l_connections[j].TargetNodeGUID;
-                    var l_targetNode = Nodes.First(x => x.GUID == l_targetNodeGuid);
-                    LinkNodesTogether(Nodes[i].outputContainer[j].Q<Port>(), (Port)l_targetNode.inputContainer[0]);
+                    string l_targetNodeGuid = l_connections[j].TargetNodeGUID;
+                    DialogNode l_targetNode = ViewNodes.First(x => x.GUID == l_targetNodeGuid);
+
+                    DialogNode l_current = ViewNodes[i];
+                    Port l_currentOutput = l_current.outputContainer[j].Q<Port>();
+                    Port l_inputTarget = (Port)l_targetNode.inputContainer[0];
+                    LinkNodesTogether(l_currentOutput, l_inputTarget);
 
                     l_targetNode.SetPosition(new Rect(
                         m_dialogContainer.DialogueNodeData.First(x => x.NodeGUID == l_targetNodeGuid).Position,
@@ -180,18 +162,9 @@ namespace CheapDialogSystem.Editor
             m_targetGraphView.Add(l_tempEdge);
         }
 
-        private void AddExposedProperties()
-        {
-            m_targetGraphView.ClearBlackBoardAndExposedProperties();
-            foreach (var l_exposedProperty in m_dialogContainer.ExposedProperties)
-            {
-                m_targetGraphView.AddPropertyToBlackBoard(l_exposedProperty);
-            }
-        }
-
         private void GenerateCommentBlocks()
         {
-            foreach (var l_commentBlock in CommentBlocks)
+            foreach (var l_commentBlock in ViewCommentBlocks)
             {
                 m_targetGraphView.RemoveElement(l_commentBlock);
             }
@@ -201,7 +174,7 @@ namespace CheapDialogSystem.Editor
                 var l_block = m_targetGraphView.CreateCommentBlock(
                     new Rect(l_commentBlockData.Position, m_targetGraphView.DefaultCommentBlockSize),
                     l_commentBlockData);
-                l_block.AddElements(Nodes.Where(x => l_commentBlockData.ChildNodes.Contains(x.GUID)));
+                l_block.AddElements(ViewNodes.Where(x => l_commentBlockData.ChildNodes.Contains(x.GUID)));
             }
         }
     }
