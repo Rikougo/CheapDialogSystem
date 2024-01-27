@@ -1,0 +1,18 @@
+{
+    "name": "CheapDialogSystem.Editor",
+    "rootNamespace": "CheapDialogSystem.Editor",
+    "references": [
+        "GUID:ec4171f83210439383bd3756d535b31c"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

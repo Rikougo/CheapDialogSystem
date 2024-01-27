@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CheapDialogSystem.Editor.Assets;
-using CheapDialogSystem.Editor.Graph;
-using UnityEditor;
-using UnityEditor.Callbacks;
 using UnityEngine;
 
 namespace CheapDialogSystem.Runtime.Assets
@@ -18,9 +14,14 @@ namespace CheapDialogSystem.Runtime.Assets
 
         public DialogNodeData EntryPoint => DialogueNodeData.First(p_dialogData => p_dialogData.EntryPoint);
 
-        public List<NodeLinkData> GetChoices(DialogNodeData p_dialog)
+        public List<DialogNodeData> GetChoices(DialogNodeData p_dialog)
         {
-            return NodeLinks.Where(p_edge => p_edge.BaseNodeGUID == p_dialog.NodeGUID).ToList();
+            List<string> l_data = NodeLinks
+                .Where(p_edge => p_edge.BaseNodeGUID == p_dialog.NodeGUID)
+                .Select(p_link => p_link.TargetNodeGUID).ToList();
+
+            List<DialogNodeData> l_nodes = DialogueNodeData.Where(p_node => l_data.Contains(p_node.NodeGUID)).ToList();
+            return l_nodes;
         }
 
         public void Clear()
@@ -29,19 +30,5 @@ namespace CheapDialogSystem.Runtime.Assets
             this.DialogueNodeData.Clear();
             this.CommentBlockData.Clear();
         }
-        
-        [OnOpenAsset]
-        //Handles opening the editor window when double-clicking project files
-        public static bool OnOpenAsset(int p_instanceID, int p_line)
-        {
-            DialogContainer project = EditorUtility.InstanceIDToObject(p_instanceID) as DialogContainer;
-            if (project != null)
-            {
-                DialogGraph.CreateGraphViewWindowWithAsset(project);
-                return true;
-            }
-            return false;
-        }
-
     }
 }

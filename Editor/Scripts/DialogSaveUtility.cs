@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CheapDialogSystem.Editor.Assets;
 using CheapDialogSystem.Editor.Graph;
 using CheapDialogSystem.Editor.Node;
 using CheapDialogSystem.Runtime.Assets;
@@ -118,7 +117,7 @@ namespace CheapDialogSystem.Editor
         {
             foreach (var l_perNode in m_dialogContainer.DialogueNodeData)
             {
-                DialogNode l_tempNode = m_targetGraphView.CreateNode(l_perNode.DialogText, Vector2.zero);
+                DialogNode l_tempNode = m_targetGraphView.CreateNode(l_perNode.DialogTitle, l_perNode.DialogText, Vector2.zero);
                 l_tempNode.GUID = l_perNode.NodeGUID;
                 m_targetGraphView.AddElement(l_tempNode);
 

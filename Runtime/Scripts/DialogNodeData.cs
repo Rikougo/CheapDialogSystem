@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace CheapDialogSystem.Editor.Assets
+namespace CheapDialogSystem.Runtime.Assets
 {
     [Serializable]
     public struct DialogNodeData

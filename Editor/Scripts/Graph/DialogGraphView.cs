@@ -76,15 +76,15 @@ namespace CheapDialogSystem.Editor.Graph
 
         public void CreateNewDialogueNode(string p_nodeName, Vector2 p_position)
         {
-            AddElement(CreateNode(p_nodeName, p_position));
+            AddElement(CreateNode(string.Empty, p_nodeName, p_position));
         }
 
-        public DialogNode CreateNode(string p_nodeName, Vector2 p_position)
+        public DialogNode CreateNode(string p_dialogTitle, string p_nodeName, Vector2 p_position)
         {
             DialogNode l_tempDialogueNode = new DialogNode()
             {
                 title = "Dialog",
-                DialogTitle = "Title",
+                DialogTitle = p_dialogTitle,
                 DialogText = p_nodeName,
                 GUID = Guid.NewGuid().ToString()
             };
@@ -97,7 +97,7 @@ namespace CheapDialogSystem.Editor.Graph
             };
             l_tempDialogueNode.titleButtonContainer.Add(l_button);
             
-            TextField l_titleField = new TextField("")
+            TextField l_titleField = new TextField("Title")
             {
                 name = "title_editor",
                 maxLength = 50
