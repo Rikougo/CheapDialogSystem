@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CheapDialogSystem.Editor.Node;
 using CheapDialogSystem.Runtime.Assets;
 using UnityEditor.Experimental.GraphView;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -76,16 +77,17 @@ namespace CheapDialogSystem.Editor.Graph
 
         public void CreateNewDialogueNode(string p_nodeName, Vector2 p_position)
         {
-            AddElement(CreateNode(string.Empty, p_nodeName, p_position));
+            AddElement(CreateNode(DialogNodeData.CreateDefault(), p_position));
         }
 
-        public DialogNode CreateNode(string p_dialogTitle, string p_nodeName, Vector2 p_position)
+        public DialogNode CreateNode(DialogNodeData p_data, Vector2 p_position)
         {
             DialogNode l_tempDialogueNode = new DialogNode()
             {
                 title = "Dialog",
-                DialogTitle = p_dialogTitle,
-                DialogText = p_nodeName,
+                DialogTitle = p_data.DialogTitle,
+                DialogText = p_data.DialogText,
+                Sound = p_data.Sound,
                 GUID = Guid.NewGuid().ToString()
             };
 
@@ -127,8 +129,17 @@ namespace CheapDialogSystem.Editor.Graph
             };
             l_contentField.RegisterValueChangedCallback(l_tempDialogueNode.OnContentChangeEvent);
             l_contentField.SetValueWithoutNotify(l_tempDialogueNode.DialogText);
-            
+
             l_tempDialogueNode.mainContainer.Add(l_contentField);
+            
+            ObjectField l_audioField = new ObjectField()
+            {
+                objectType = typeof(AudioClip)
+            };
+            l_audioField.RegisterValueChangedCallback(l_tempDialogueNode.OnSoundChangeEvent);
+            l_audioField.SetValueWithoutNotify(l_tempDialogueNode.Sound);
+            
+            l_tempDialogueNode.mainContainer.Add(l_audioField);
             return l_tempDialogueNode;
         }
 

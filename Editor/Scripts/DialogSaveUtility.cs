@@ -59,6 +59,7 @@ namespace CheapDialogSystem.Editor
                     NodeGUID = l_node.GUID,
                     DialogTitle = l_node.DialogTitle,
                     DialogText = l_node.DialogText,
+                    Sound = l_node.Sound,
                     Position = l_node.GetPosition().position,
                     EntryPoint = l_isEntryPoint
                 });
@@ -117,7 +118,7 @@ namespace CheapDialogSystem.Editor
         {
             foreach (var l_perNode in m_dialogContainer.DialogueNodeData)
             {
-                DialogNode l_tempNode = m_targetGraphView.CreateNode(l_perNode.DialogTitle, l_perNode.DialogText, Vector2.zero);
+                DialogNode l_tempNode = m_targetGraphView.CreateNode(l_perNode, Vector2.zero);
                 l_tempNode.GUID = l_perNode.NodeGUID;
                 m_targetGraphView.AddElement(l_tempNode);
 

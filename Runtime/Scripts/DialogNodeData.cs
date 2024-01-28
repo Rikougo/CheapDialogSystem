@@ -14,5 +14,16 @@ namespace CheapDialogSystem.Runtime.Assets
         // --- Runtime values --- //
         public string DialogTitle;
         public string DialogText;
+        public AudioClip Sound;
+
+        public static DialogNodeData CreateDefault()
+        {
+            return new DialogNodeData()
+            {
+                DialogTitle = string.Empty,
+                DialogText = "Text",
+                Sound = null
+            };
+        }
     }
 }

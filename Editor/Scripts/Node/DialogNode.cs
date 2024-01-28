@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
 using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace CheapDialogSystem.Editor.Node
 {
@@ -9,6 +11,7 @@ namespace CheapDialogSystem.Editor.Node
     {
         public string DialogTitle;
         public string DialogText;
+        public AudioClip Sound;
         public string GUID;
         public bool EntryPoint = false;
 
@@ -22,6 +25,11 @@ namespace CheapDialogSystem.Editor.Node
         public void OnContentChangeEvent(ChangeEvent<string> p_event)
         {
             DialogText = p_event.newValue;
+        }
+
+        public void OnSoundChangeEvent(ChangeEvent<Object> p_event)
+        {
+            Sound = p_event.newValue as AudioClip;
         }
 
         public void AddChoicePort()
